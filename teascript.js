@@ -9,12 +9,14 @@
 @ N- go to index !
 ? N ( ) - if...
 ! - output !
-: - input
+: N - input
 c - clear console
 b - break
 r N - round(random*N)
 () N - setInterval, N - interval
+f N - cause function
 # - color
+		N - number
 */
 
 
