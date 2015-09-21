@@ -1,15 +1,20 @@
 /*
 
-+ - plus !
-- - minus !
++ N - plus !
+- N- minus !
 > - right !
 < - left !
 { } - function	
 [ ] - while
-@ - go to index !
-?number( ) - if...
+@ N- go to index !
+? N ( ) - if...
 ! - output !
 : - input
+c - clear console
+b - break
+r N - round(random*N)
+() N - setInterval, N - interval
+# - color
 */
 
 
