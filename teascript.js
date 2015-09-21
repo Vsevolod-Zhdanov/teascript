@@ -19,7 +19,7 @@ r N - round(random*N)
 
 
 var TeaScript = function() {
-	this.js = 'var memory = [], cell = 30000, index = 0, color = ""; for(var _ = 30000; _--;) {memory[_] = 0}; document.onkeydown = function(e){memory[cell] = e.charCode; console.log(e.charCode)};'
+	this.js = 'var memory = [], cell = 30000, index = 0, color = ""; for(var _ = 30000; _--;) {memory[_] = 0}; setInterval(function() {document.onkeydown = function(e) {memory[cell] = e.which}}, 10);'
 	this.ts = '',
 		this.step = 0,
 
@@ -74,19 +74,19 @@ var TeaScript = function() {
 		},
 
 		this._color = function() {
-			//this.js += 'color = ' + "'" + (this.ts.substring(this.step).match(/#(\d+)/)[1]) + "'" + ';';
-			this.js += 'color = memory[index];';
+			this.js += 'color = ' + "'" + (this.ts.substring(this.step).match(/#([A-Z0-9]+)/)[1]) + "'" + ';';
+			//this.js += 'color = memory[index];';
 			this.step++;
 		},
 
 		this._write = function() {
-			//this.js += "document.write('<span style = 'color:' + color + ''>' + String.fromCharCode(memory[index]) + '</span>');";
-			this.js += "document.write('<span style = \"color:hsl(' + color + ', 150%, 25%)\">' + String.fromCharCode(memory[index]) + \'</span>');"
+			//this.js += "document.write('<span style = \"color:hsl(' + color + ', 150%, 25%)\">' + String.fromCharCode(memory[index]) + \'</span>');"
+			this.js += "document.write('<span style = \"color: ' + color + '\">' + String.fromCharCode(memory[index]) + \'</span>');"
 			this.step++;
 		},
 
 		this._read = function() {
-			this.js += ''; // !!!!!!!!!!!!!!!!!
+			this.js += 'cell = ' + (this.ts.substring(this.step).match(/:(\d+)/)[1] | 0) + ';';
 			this.step++;
 		},
 
@@ -111,6 +111,18 @@ var TeaScript = function() {
 		},
 		this._interClose = function() {
 			this.js += '},' + (this.ts.substring(this.step).match(/\)(\d+)/)[1]) + ');';
+			this.step++;
+		},
+		this._funcOpen = function() {
+			this.js += 'memory[index] = function() {';
+			this.step++;
+		},
+		this._funcClose = function() {
+			this.js += '};';
+			this.step++;
+		},
+		this._causeFunc = function() {
+			this.js += 'memory[' + (this.ts.substring(this.step).match(/f(\d+)/)[1]) + ']();';
 			this.step++;
 		},
 
@@ -153,6 +165,12 @@ var TeaScript = function() {
 					case ')':
 						this._interClose();
 						break;
+					case '{':
+						this._interOpen();
+						break;
+					case '}':
+						this._interClose();
+						break;
 					case '!':
 						this._write();
 						break;
@@ -162,9 +180,6 @@ var TeaScript = function() {
 					case '#':
 						this._color();
 						break;
-					case '{':
-						this._func();
-						break;
 					case 'b':
 						this._break();
 						break;
@@ -173,6 +188,9 @@ var TeaScript = function() {
 						break;
 					case 'r':
 						this._rand();
+						break;
+					case 'f':
+						this._causeFunc();
 						break;
 					default:
 						this.step++;
@@ -187,7 +205,7 @@ var TeaScript = function() {
 };
 var teascript = new TeaScript();
 
-teascript.ts = '> +15 > +300 << (+1 @100 r1000 # ! @0 ?1 b> +15 <; ?2 c >> +300 <<;)1';
+teascript.ts = '#CC0000{+1!}(f0)10(c)1000';
 
 console.log(teascript.translate());
 teascript.run();
