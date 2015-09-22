@@ -22,7 +22,7 @@ f N - cause function
 
 var TeaScript = function() {
 	this.js = 'var memory = [], cell = 30000, index = 0, color = ""; for(var _ = 30000; _--;) {memory[_] = 0}; setInterval(function() {document.onkeydown = function(e) {memory[cell] = e.which}}, 10);'
-	this.ts = '+72!+29!+7!!+3!-79!+55!+24!+3!-6!-8!',
+	this.ts = '',
 	this.step = 0,
 	this.functions = {
 		'+': function(q) {
@@ -90,7 +90,8 @@ var TeaScript = function() {
 		},
 	},
 
-	this.translate = function() {
+	this.translate = function(code) {
+		this.ts = code;
 		while (this.step < this.ts.length) {
 			var func = this.functions[this.ts[this.step]];
 			if (func != undefined) func(this);
@@ -103,5 +104,5 @@ var TeaScript = function() {
 	}
 };
 var teascript = new TeaScript();
-console.log(teascript.translate());
+teascript.translate('+72!+29!+7!!+3!-79!+55!+24!+3!-6!-8!'); // Hello World
 teascript.run();
