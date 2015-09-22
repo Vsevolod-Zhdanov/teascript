@@ -22,192 +22,86 @@ f N - cause function
 
 var TeaScript = function() {
 	this.js = 'var memory = [], cell = 30000, index = 0, color = ""; for(var _ = 30000; _--;) {memory[_] = 0}; setInterval(function() {document.onkeydown = function(e) {memory[cell] = e.which}}, 10);'
-	this.ts = '',
-		this.step = 0,
+	this.ts = '+72!+29!+7!!+3!-79!+55!+24!+3!-6!-8!',
+	this.step = 0,
+	this.functions = {
+		'+': function(q) {
+			q.js += 'memory[index] +=' + (q.ts.substring(q.step).match(/\+(\d+)/)[1]) + ';';
+		},
+		'-': function(q) {
+			q.js += 'memory[index] -=' + (q.ts.substring(q.step).match(/\-(\d+)/)[1]) + ';';
+		},
+		'>': function(q) {
+			q.js += 'index ++;';
+		},
+		'<': function(q) {
+			q.js += 'index --;';
+		},
+		'[': function(q) {
+			q.js += 'while(memory[index]) {';
+		},
+		']': function(q) {
+			q.js += '};';
+		},
+		'(': function(q) {
+			q.js += 'setInterval(function() {';
+		},
+		')': function(q) {
+			q.js += '},' + (q.ts.substring(q.step).match(/\)(\d+)/)[1]) + ');';
+		},
+		'{': function(q) {
+			q.js += 'memory[index] = function() {';
+		},
+		'}': function(q) {
+			q.js += '};';
+		},
+		'?': function(q) {
+			q.js += 'if (memory[index] == memory[' + (q.ts.substring(q.step).match(/\?(\d+)/)[1] | 0) + ']){';
+		},
+		'^': function(q) {
+			q.js += '} else {';
+		},
+		';': function(q) {
+			q.js += '}';
+		},
+		'@': function(q) {
+			q.js += ('index = ' + (q.ts.substring(q.step).match(/@(\d+)/)[1]) + ';');
+		},
+		'#': function(q) {
+			q.js += 'color = ' + "'" + (q.ts.substring(q.step).match(/#([A-Z0-9]+)/)[1]) + "'" + ';';
+		},
+		'!': function(q) {
+			q.js += "document.write('<span style = \"color: ' + color + '\">' + String.fromCharCode(memory[index]) + \'</span>');"
+		},
+		':': function(q) {
+			q.js += 'cell = ' + (q.ts.substring(q.step).match(/:(\d+)/)[1] | 0) + ';';
+		},
+		'r': function(q) {
+			q.js += 'memory[index] = Math.round(Math.random() * ' + (q.ts.substring(q.step).match(/r(\d+)/)[1] | 0) + ');';
+		},
+		'c': function(q) {
+			q.js += 'document.body.innerHTML = "";';
+		},
+		'b': function(q) {
+			q.js += 'document.write("<br>");';
+		},
+		'f': function(q) {
+			q.js += 'memory[' + (q.ts.substring(q.step).match(/f(\d+)/)[1]) + ']();';
+		},
+	},
 
-		this._plus = function() {
-			this.js += 'memory[index] +=' + (this.ts.substring(this.step).match(/\+(\d+)/)[1]) + ';';
+	this.translate = function() {
+		while (this.step < this.ts.length) {
+			var func = this.functions[this.ts[this.step]];
+			if (func != undefined) func(this);
 			this.step++;
-		},
-
-		this._minus = function() {
-			this.js += 'memory[index] -=' + (this.ts.substring(this.step).match(/\-(\d+)/)[1]) + ';';
-			this.step++;
-		},
-
-		this._left = function() {
-			this.js += 'index ++;';
-			this.step++;
-		},
-
-		this._right = function() {
-			this.js += 'index --;';
-			this.step++;
-		},
-
-		this._cycleOpen = function() {
-			this.js += 'while(memory[index]) {';
-			this.step++;
-		},
-
-		this._cycleClose = function() {
-			this.js += '};';
-			this.step++;
-		},
-
-		this._ifOpen = function() {
-			this.js += 'if (memory[index] == memory[' + (this.ts.substring(this.step).match(/\?(\d+)/)[1] | 0) + ']){';
-			this.step++;
-		},
-
-		this._elseOpen = function() {
-			this.js += '} else {';
-			this.step++;
-		},
-
-		this._ifClose = function() {
-			this.js += '}';
-			this.step++;
-		},
-
-		this._gotoIndex = function() {
-			this.js += ('index = ' + (this.ts.substring(this.step).match(/@(\d+)/)[1]) + ';');
-			this.step++;
-		},
-
-		this._color = function() {
-			this.js += 'color = ' + "'" + (this.ts.substring(this.step).match(/#([A-Z0-9]+)/)[1]) + "'" + ';';
-			//this.js += 'color = memory[index];';
-			this.step++;
-		},
-
-		this._write = function() {
-			//this.js += "document.write('<span style = \"color:hsl(' + color + ', 150%, 25%)\">' + String.fromCharCode(memory[index]) + \'</span>');"
-			this.js += "document.write('<span style = \"color: ' + color + '\">' + String.fromCharCode(memory[index]) + \'</span>');"
-			this.step++;
-		},
-
-		this._read = function() {
-			this.js += 'cell = ' + (this.ts.substring(this.step).match(/:(\d+)/)[1] | 0) + ';';
-			this.step++;
-		},
-
-		this._break = function() {
-			this.js += 'document.write("<br>");';
-			this.step++;
-		},
-
-		this._clear = function() {
-			this.js += 'document.body.innerHTML = "";';
-			this.step++;
-		},
-
-		this._rand = function() {
-			this.js += 'memory[index] = Math.round(Math.random() * ' + (this.ts.substring(this.step).match(/r(\d+)/)[1] | 0) + ');';
-			this.step++;
-		}
-
-	this._interOpen = function() {
-			this.js += 'setInterval(function() {';
-			this.step++;
-		},
-		this._interClose = function() {
-			this.js += '},' + (this.ts.substring(this.step).match(/\)(\d+)/)[1]) + ');';
-			this.step++;
-		},
-		this._funcOpen = function() {
-			this.js += 'memory[index] = function() {';
-			this.step++;
-		},
-		this._funcClose = function() {
-			this.js += '};';
-			this.step++;
-		},
-		this._causeFunc = function() {
-			this.js += 'memory[' + (this.ts.substring(this.step).match(/f(\d+)/)[1]) + ']();';
-			this.step++;
-		},
-
-		this.translate = function() {
-			while (this.step < this.ts.length) {
-				switch (this.ts[this.step]) {
-					case '+':
-						this._plus();
-						break;
-					case '-':
-						this._minus();
-						break;
-					case '>':
-						this._left();
-						break;
-					case '<':
-						this._right();
-						break;
-					case '[':
-						this._cycleOpen();
-						break;
-					case ']':
-						this._cycleClose();
-						break;
-					case '?':
-						this._ifOpen();
-						break;
-					case '^':
-						this._elseOpen();
-						break;
-					case ';':
-						this._ifClose();
-						break;
-					case '@':
-						this._gotoIndex();
-						break;
-					case '(':
-						this._interOpen();
-						break;
-					case ')':
-						this._interClose();
-						break;
-					case '{':
-						this._interOpen();
-						break;
-					case '}':
-						this._interClose();
-						break;
-					case '!':
-						this._write();
-						break;
-					case ':':
-						this._read();
-						break;
-					case '#':
-						this._color();
-						break;
-					case 'b':
-						this._break();
-						break;
-					case 'c':
-						this._clear();
-						break;
-					case 'r':
-						this._rand();
-						break;
-					case 'f':
-						this._causeFunc();
-						break;
-					default:
-						this.step++;
-				};
-			};
-
-			return this.js;
-		},
-		this.run = function() {
-			eval(this.js);
-		}
+		};
+		return this.js;
+	},
+	this.run = function() {
+		eval(this.js);
+	}
 };
 var teascript = new TeaScript();
-
-teascript.ts = '#CC0000{+1!}(f0)10(c)1000';
-
 console.log(teascript.translate());
 teascript.run();
