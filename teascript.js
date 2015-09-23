@@ -87,8 +87,7 @@ var TeaScript = function() {
 			}
 		},
 		'!': function(q) {
-			q.js += "document.write('<span style = \"color:hsl(' + color + ', 150%, 25%)\">' + 
-			String.fromCharCode(memory[index]) + \'</span>');"
+			q.js += "document.write('<span style = \"color:hsl(' + color + ', 150%, 25%)\">' + String.fromCharCode(memory[index]) + \'</span>');"
 		},
 		':': function(q) {
 			q.js += 'cell = ' + (q.code.substring(q.step).match(/:(\d+)/)[1] | 0) + ';';
