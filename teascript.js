@@ -8,6 +8,8 @@
 [ ] - while
 @ N- go to index !
 ? N ( ) - if...
+^ - else..
+; - close if/else
 ! - output !
 : N - input
 c - clear console
