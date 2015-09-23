@@ -1,37 +1,27 @@
-/*
-
-+ N - plus !
-- N- minus !
-> - right !
-< - left !
-{ } - function	
-[ ] - while
-@ N- go to index !
-? N ( ) - if...
-^ - else..
-; - close if/else
-! - output !
-: N - input
-c - clear console
-b - break
-r N - round(random*N)
-() N - setInterval, N - interval
-f N - cause function
-# - color
-		N - number
-*/
-
-
 var TeaScript = function() {
-	this.js = 'var memory = [], cell = 30000, index = 0, color = ""; for(var _ = 30000; _--;) {memory[_] = 0}; setInterval(function() {document.onkeydown = function(e) {memory[cell] = e.which}}, 10);'
-	this.ts = '',
-	this.step = 0,
+	this.js = 'var memory = [], cell = 30000, index = 0, color = ""; for(var _ = 30000; _--;) ' +
+		'{memory[_] = 0}; setInterval(function() {document.onkeydown = function(e) {memory[cell] = e.which}}, 10);'
+	this.code = '',
+		this.step = 0,
+
 	this.functions = {
 		'+': function(q) {
-			q.js += 'memory[index] +=' + (q.ts.substring(q.step).match(/\+(\d+)/)[1]) + ';';
+			if (q.code[q.step + 1] == '`') {
+				q.js += 'memory[index] += memory[' +
+					(q.code.substring(q.step).match(/\`(\d+)/)[1]) + '];';
+			} else {
+				q.js += 'memory[index] +=' +
+					(q.code.substring(q.step).match(/\+(\d+)/)[1]) + ';';
+			}
 		},
 		'-': function(q) {
-			q.js += 'memory[index] -=' + (q.ts.substring(q.step).match(/\-(\d+)/)[1]) + ';';
+			if (q.code[q.step + 1] == '`') {
+				q.js += 'memory[index] -= memory[' +
+					(q.code.substring(q.step).match(/\`(\d+)/)[1]) + '];';
+			} else {
+				q.js += 'memory[index] -=' +
+					(q.code.substring(q.step).match(/\-(\d+)/)[1]) + ';';
+			}
 		},
 		'>': function(q) {
 			q.js += 'index ++;';
@@ -49,7 +39,13 @@ var TeaScript = function() {
 			q.js += 'setInterval(function() {';
 		},
 		')': function(q) {
-			q.js += '},' + (q.ts.substring(q.step).match(/\)(\d+)/)[1]) + ');';
+			if (q.code[q.step + 1] == '`') {
+				q.js += '}, memory[' +
+					(q.code.substring(q.step).match(/\`(\d+)/)[1]) + ']);';
+			} else {
+				q.js += '},' +
+					(q.code.substring(q.step).match(/\)(\d+)/)[1]) + ');';
+			}
 		},
 		'{': function(q) {
 			q.js += 'memory[index] = function() {';
@@ -58,7 +54,13 @@ var TeaScript = function() {
 			q.js += '};';
 		},
 		'?': function(q) {
-			q.js += 'if (memory[index] == memory[' + (q.ts.substring(q.step).match(/\?(\d+)/)[1] | 0) + ']){';
+			if (q.code[q.step + 1] == '`') {
+				q.js += 'if (memory[index] == memory[memory[' +
+					(q.code.substring(q.step).match(/\`(\d+)/)[1]) + ']]){';
+			} else {
+				q.js += 'if (memory[index] == memory[' +
+					(q.code.substring(q.step).match(/\?(\d+)/)[1]) + ']){';
+			}
 		},
 		'^': function(q) {
 			q.js += '} else {';
@@ -67,19 +69,37 @@ var TeaScript = function() {
 			q.js += '}';
 		},
 		'@': function(q) {
-			q.js += ('index = ' + (q.ts.substring(q.step).match(/@(\d+)/)[1]) + ';');
+			if (q.code[q.step + 1] == '`') {
+				q.js += ('index = memory[' +
+					(q.code.substring(q.step).match(/\`(\d+)/)[1]) + '];');
+			} else {
+				q.js += ('index = ' +
+					(q.code.substring(q.step).match(/@(\d+)/)[1]) + ';');
+			}
 		},
 		'#': function(q) {
-			q.js += 'color = ' + "'" + (q.ts.substring(q.step).match(/#([A-Z0-9]+)/)[1]) + "'" + ';';
+			if (q.code[q.step + 1] == '`') {
+				q.js += ('color = memory[' +
+					(q.code.substring(q.step).match(/\`(\d+)/)[1]) + '];');
+			} else {
+				//q.js += 'color = ' + "'" + (q.code.substring(q.step).match(/#([A-Z0-9]+)/)[1]) + "'" + ';';
+				q.js += 'color = memory[index];';
+			}
 		},
 		'!': function(q) {
-			q.js += "document.write('<span style = \"color: ' + color + '\">' + String.fromCharCode(memory[index]) + \'</span>');"
+			q.js += "document.write('<span style = \"color:hsl(' + color + ', 150%, 25%)\">' + String.fromCharCode(memory[index]) + \'</span>');"
 		},
 		':': function(q) {
-			q.js += 'cell = ' + (q.ts.substring(q.step).match(/:(\d+)/)[1] | 0) + ';';
+			q.js += 'cell = ' + (q.code.substring(q.step).match(/:(\d+)/)[1] | 0) + ';';
 		},
 		'r': function(q) {
-			q.js += 'memory[index] = Math.round(Math.random() * ' + (q.ts.substring(q.step).match(/r(\d+)/)[1] | 0) + ');';
+			if (q.code[q.step + 1] == '`') {
+				q.js += 'memory[index] = Math.round(Math.random() * memory[' +
+					(q.code.substring(q.step).match(/\`(\d+)/)[1] | 0) + ']);';
+			} else {
+				q.js += 'memory[index] = Math.round(Math.random() * ' +
+					(q.code.substring(q.step).match(/r(\d+)/)[1] | 0) + ');';
+			}
 		},
 		'c': function(q) {
 			q.js += 'document.body.innerHTML = "";';
@@ -88,14 +108,17 @@ var TeaScript = function() {
 			q.js += 'document.write("<br>");';
 		},
 		'f': function(q) {
-			q.js += 'memory[' + (q.ts.substring(q.step).match(/f(\d+)/)[1]) + ']();';
+			if (q.code[q.step + 1] == '`') {
+				q.js += 'memory[memory[' + (q.code.substring(q.step).match(/\`(\d+)/)[1]) + ']]();';
+			} else {
+				q.js += 'memory[' + (q.code.substring(q.step).match(/f(\d+)/)[1]) + ']();';
+			}
 		},
 	},
 
-	this.translate = function(code) {
-		this.ts = code;
-		while (this.step < this.ts.length) {
-			var func = this.functions[this.ts[this.step]];
+	this.translate = function() {
+		while (this.step < this.code.length) {
+			var func = this.functions[this.code[this.step]];
 			if (func != undefined) func(this);
 			this.step++;
 		};
@@ -105,6 +128,3 @@ var TeaScript = function() {
 		eval(this.js);
 	}
 };
-var teascript = new TeaScript();
-teascript.translate('+72!+29!+7!!+3!-79!+55!+24!+3!-6!-8!'); // Hello World
-teascript.run();
